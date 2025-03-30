@@ -6,27 +6,38 @@ import com.example.ecommerce.demo.repository.OrderItemRepository;
 import com.example.ecommerce.demo.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import com.example.ecommerce.demo.dto.OrderItemResponse;
 import com.example.ecommerce.demo.dto.OrderRequest;
+import com.example.ecommerce.demo.dto.OrderResponse;
+import com.example.ecommerce.demo.dto.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository = null;
-    private final OrderItemRepository orderItemRepository = null;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+
+    // Constructor injection (recommended)
+    public OrderService(OrderRepository orderRepository,
+                      OrderItemRepository orderItemRepository) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+    }
 
     @Transactional
-    @Autowired
     public Order placeOrder(OrderRequest request) {
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus(Order.OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING);
         
         // 2. Calculate total amount
         BigDecimal totalAmount = request.getItems().stream()
@@ -55,5 +66,37 @@ public class OrderService {
         
      
     }
+
+@Transactional(readOnly = true)
+public OrderResponse getOrderDetails(Long orderId) {
+    Order order = orderRepository.findById(orderId)
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, 
+            "Order not found with id: " + orderId));
+
+    // Manual mapping
+    OrderResponse response = new OrderResponse();
+    response.setId(order.getId());
+    response.setCustomerId(order.getCustomerId());
+    response.setTotalAmount(order.getTotalAmount());
+    response.setStatus(order.getStatus());
+    response.setOrderDate(order.getOrderDate());
+    
+    // Map order items
+    List<OrderItemResponse> itemResponses = order.getItems().stream()
+        .map(item -> {
+            OrderItemResponse itemResponse = new OrderItemResponse();
+            itemResponse.setId(item.getId());
+            itemResponse.setProductId(item.getProductId());
+            itemResponse.setQuantity(item.getQuantity());
+            itemResponse.setUnitPrice(item.getUnitPrice());
+            return itemResponse;
+        })
+        .collect(Collectors.toList());
+    
+    response.setItems(itemResponses);
+    
+    return response;
+}
 
 }

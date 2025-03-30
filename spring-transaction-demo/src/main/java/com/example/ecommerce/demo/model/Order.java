@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.ecommerce.demo.dto.OrderStatus;
+
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -25,10 +27,6 @@ public class Order {
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
-    
-    public enum OrderStatus {
-        PENDING, PROCESSING, COMPLETED, CANCELLED
-    }
     
     // Constructors
     public Order() {}
