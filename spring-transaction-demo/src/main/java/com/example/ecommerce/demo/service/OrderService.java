@@ -4,6 +4,9 @@ import com.example.ecommerce.demo.model.Order;
 import com.example.ecommerce.demo.model.OrderItem;
 import com.example.ecommerce.demo.repository.OrderItemRepository;
 import com.example.ecommerce.demo.repository.OrderRepository;
+
+import lombok.AllArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import com.example.ecommerce.demo.dto.OrderItemResponse;
@@ -21,16 +24,10 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 
 @Service
+@AllArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-
-    // Constructor injection (recommended)
-    public OrderService(OrderRepository orderRepository,
-                      OrderItemRepository orderItemRepository) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-    }
 
     @Transactional
     public Order placeOrder(OrderRequest request) {

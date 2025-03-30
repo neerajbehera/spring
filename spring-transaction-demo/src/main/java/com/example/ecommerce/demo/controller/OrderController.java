@@ -40,7 +40,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createOrder(@Valid @RequestBody OrderRequest request) {
+    public ResponseEntity<Order> createOrder(@Valid @RequestBody OrderRequest request) {
         System.out.println("Creating order...");
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
@@ -74,7 +74,7 @@ public class OrderController {
 
         Order savedOrder = orderRepository.save(order);
         System.out.println("saveorder processed: ");
-        return ResponseEntity.ok(savedOrder.getId());
+        return ResponseEntity.ok(savedOrder);
     }
 
     @GetMapping("/{orderId}")
