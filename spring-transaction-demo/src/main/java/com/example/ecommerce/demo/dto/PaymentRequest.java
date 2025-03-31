@@ -1,5 +1,7 @@
 package com.example.ecommerce.demo.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +15,7 @@ public class PaymentRequest {
 
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
-    private Double amount;
+    private BigDecimal amount;
 
     @NotBlank(message = "Card number is required for card payments")
     private String cardNumber;     // Only required for card payments
