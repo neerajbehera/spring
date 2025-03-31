@@ -5,6 +5,7 @@ import com.example.ecommerce.demo.dto.OrderResponse;
 import com.example.ecommerce.demo.dto.PaymentRequest;
 import com.example.ecommerce.demo.dto.PaymentResponse;
 import com.example.ecommerce.demo.model.*;
+import com.example.ecommerce.demo.service.InventoryService;
 import com.example.ecommerce.demo.service.OrderService;
 import com.example.ecommerce.demo.service.PaymentService;
 
@@ -19,10 +20,12 @@ public class OrderController {
 
     private OrderService orderService;
     private PaymentService paymentService;
-
-    public OrderController(OrderService orderService,PaymentService paymentService) {
-        this.orderService = orderService;
-        this.paymentService = paymentService;
+    private InventoryService inventoryService;
+    
+        public OrderController(OrderService orderService,PaymentService paymentService, InventoryService inventoryService) {
+            this.orderService = orderService;
+            this.paymentService = paymentService;
+            this.inventoryService = inventoryService;
     }
 
     @GetMapping("/test")
@@ -33,6 +36,8 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> createOrder(@Valid @RequestBody OrderRequest request) {
         System.out.println("Creating order...");
+        // 1. Check inventory
+        inventoryService.checkAndDeductInventory(request.getItems());
         Order order = orderService.placeOrder(request);
         return ResponseEntity.ok(order);
     }
