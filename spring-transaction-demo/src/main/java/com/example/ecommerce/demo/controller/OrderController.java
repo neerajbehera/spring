@@ -2,6 +2,7 @@ package com.example.ecommerce.demo.controller;
 
 import com.example.ecommerce.demo.dto.OrderRequest;
 import com.example.ecommerce.demo.dto.OrderResponse;
+import com.example.ecommerce.demo.dto.OrderUpdateRequest;
 import com.example.ecommerce.demo.dto.PaymentRequest;
 import com.example.ecommerce.demo.dto.PaymentResponse;
 import com.example.ecommerce.demo.model.*;
@@ -9,6 +10,7 @@ import com.example.ecommerce.demo.service.InventoryService;
 import com.example.ecommerce.demo.service.OrderService;
 import com.example.ecommerce.demo.service.PaymentService;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,25 @@ public class OrderController {
             PaymentResponse response = paymentService.processPayment(orderId, paymentRequest);
             return ResponseEntity.ok(response);
 
+    }
+
+    // Get order with PESSIMISTIC_WRITE lock
+    @GetMapping("/{id}/lock")
+    public ResponseEntity<Order> getOrderWithLock(@PathVariable Long id) {
+        Order response = orderService.getOrderWithLock(id);
+            return ResponseEntity.ok(response);
+    }
+    
+
+      // Update order (uses the lock)
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id,@RequestBody OrderUpdateRequest request) {
+
+        Order response = orderService.updateOrder(id, request);
+            return ResponseEntity.ok(response);
+        
+        
     }
 
    

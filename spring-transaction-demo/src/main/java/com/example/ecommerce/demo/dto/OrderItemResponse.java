@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderItemResponse {
     private String productId;
+
+    private Long id;
     
     private String productName;
     
@@ -25,8 +27,7 @@ public class OrderItemResponse {
     
     private String imageUrl;
 
-    public void setId(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setId'");
-    }
+
+
+    
 }

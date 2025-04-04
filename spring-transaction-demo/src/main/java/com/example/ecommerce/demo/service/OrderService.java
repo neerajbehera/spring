@@ -13,6 +13,9 @@ import com.example.ecommerce.demo.dto.OrderItemResponse;
 import com.example.ecommerce.demo.dto.OrderRequest;
 import com.example.ecommerce.demo.dto.OrderResponse;
 import com.example.ecommerce.demo.dto.OrderStatus;
+import com.example.ecommerce.demo.dto.OrderUpdateRequest;
+import com.example.ecommerce.demo.exception.OrderNotFoundException;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Service
 @AllArgsConstructor
@@ -94,6 +98,35 @@ public OrderResponse getOrderDetails(Long orderId) {
     response.setItems(itemResponses);
     
     return response;
+}
+
+public Order updateOrder(Long id, OrderUpdateRequest request)  {
+    // This will acquire PESSIMISTIC_WRITE lock
+        Order order = orderRepository.findByIdWithLock(id)
+            .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+        System.out.println("updated order status: " + request.getStatus());
+        System.out.println("Sleep for 7 seconds to simulate long processing time");
+        try {
+            Thread.sleep(7000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // Simulate long processing time
+        
+        // Update order fields
+        order.setStatus(request.getStatus());
+        order.setTotalAmount(request.getTotalAmount());
+        
+        Order updatedOrder = orderRepository.save(order);
+        System.out.println("Updated order staus : " + updatedOrder.getStatus());
+        return updatedOrder;
+}
+
+public Order getOrderWithLock(Long id) {
+    Order order = orderRepository.findByIdWithLock(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found"));
+
+        return order;
 }
 
 }
